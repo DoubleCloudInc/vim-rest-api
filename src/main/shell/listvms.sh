@@ -1,0 +1,2 @@
+curl -X POST "http://admin:doublecloud@localhost:8080/api/ServiceInstance" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"password\": \"doublecloud\", \"ip\": \"192.168.0.200\", \"username\": \"root\"}"
+curl -X GET "http://admin:doublecloud@localhost:8080/api/VirtualMachine"
