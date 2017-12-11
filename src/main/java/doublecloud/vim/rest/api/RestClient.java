@@ -25,6 +25,11 @@ public class RestClient
     this.authHeader = "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
   }
 
+  public void addServer(String ip, String username, String password) throws IOException {
+    String addVC = "{\"ip\": \"" + ip + "\",\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+    this.post("ServiceInstance", addVC);
+  }
+
   public String get(String relPath) throws MalformedURLException, IOException {
     URL url = new URL(baseUrl + "/" + relPath);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();

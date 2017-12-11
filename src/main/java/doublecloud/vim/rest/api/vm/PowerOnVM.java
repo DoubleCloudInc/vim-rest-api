@@ -1,6 +1,8 @@
 /** Copyright DoubleCloud Inc. */
-package doublecloud.vim.rest.api;
+package doublecloud.vim.rest.api.vm;
 
+import doublecloud.vim.rest.api.JsonUtil;
+import doublecloud.vim.rest.api.RestClient;
 import java.io.IOException;
 
 /**
@@ -9,18 +11,36 @@ import java.io.IOException;
  */
 public class PowerOnVM
 {
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException, InterruptedException {
     RestClient client = new RestClient("http://localhost:8080/api", "admin", "doublecloud");
 
-    // only need to add a new vCenter once with a RestClient
-    String addVC = "{\"ip\": \"192.168.0.200\",\"username\": \"root\", \"password\": \"doublecloud\"}";
-    client.post("ServiceInstance", addVC);
+    String ip = "192.168.0.200";
+    String username = "root";
+    String password = "doublecloud";
+    client.addServer(ip, username, password);
 
-    String task = client.post("VirtualMachine/192.168.0.200:vm-2938/powerOffVM_Task", "");
-    System.out.println("vm task: " + task); //  {"returnval":{"type":"Task","content":"task-471822"}}
+    String moid = "vm-3094";
+    String name = client.get("VirtualMachine/192.168.0.200:" + moid + "/name,runtime.powerState");
+    System.out.println(name);
+    String powerOffTaskStr = client.post("VirtualMachine/192.168.0.200:" + moid + "/powerOffVM_Task", "");
+    System.out.println("vm task: " + powerOffTaskStr); // {"returnval":{"type":"Task","val":"task-471822"}}
 
-    // parse the task id from above string
-    String taskInfo = client.get("Task/192.168.0.200:task-471822");
+    String taskid = JsonUtil.getAsStringByPath(powerOffTaskStr, "returnval.val");
+    printTaskInfo(client, taskid);
+
+    Thread.sleep(3000);
+
+    String powerOnBody = "{\"host\":{\"type\":\"HostSystem\",\"val\":\"host-123\"}}";
+    String powerOnTaskStr = client.post("VirtualMachine/192.168.0.200:" + moid + "/powerOnVM_Task", powerOnBody);
+    System.out.println("vm task: " + powerOnTaskStr); //  {"returnval":{"type":"Task","val":"task-471822"}}
+
+    String taskid2 = JsonUtil.getAsStringByPath(powerOnTaskStr, "returnval.val");
+    printTaskInfo(client, taskid2);
+  }
+
+  static void printTaskInfo(RestClient client, String taskid) throws IOException {
+    String taskInfo = client.get("Task/192.168.0.200:" + taskid);
     System.out.println("task info: " + taskInfo);
   }
 }
+

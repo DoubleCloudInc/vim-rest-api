@@ -1,29 +1,47 @@
 /** Copyright DoubleCloud Inc. */
-package doublecloud.vim.rest.api;
+package doublecloud.vim.rest.api.evt;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import doublecloud.vim.rest.api.*;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  *
  * @author Steve
  */
-public class GetVM
+public class ListEvents
 {
   public static void main(String[] args) throws IOException {
     RestClient client = new RestClient("http://localhost:8080/api", "admin", "doublecloud");
 
-    // only need to add a new vCenter once
-    String addVC = "{\"ip\": \"192.168.0.200\",\"username\": \"root\", \"password\": \"doublecloud\"}";
-    client.post("ServiceInstance", addVC);
+    String ip = "192.168.0.200";
+    String username = "root";
+    String password = "doublecloud";
+    client.addServer(ip, username, password);
 
-    // the vm id which is part of URL can be retrieved using list operation
-    String vmAllProps = client.get("VirtualMachine/192.168.0.200:vm-126");
-    System.out.println("vm all props: " + vmAllProps);
+    // for events per type, entity, time range - no need to have all but some
+    String evtCol = "{'filter':{'category':['info'],"
+            + "'eventTypeId':['VmPoweredOffEvent'],"
+            + "'time':{'beginTime':'2017-12-07T09:18:10.001Z','endTime':'2017-12-08T09:18:10.001Z'},"
+            + "'entity':{'entity':{'type':'VirtualMachine','val':'vm-3094'},'recursion':'self'}}}".replaceAll("'", "\"");
+    String res = client.post("EventManager/" + ip + "/createCollectorForEvents", evtCol);
+    System.out.println("res:" + res);
 
-    String vmSingleProp = client.get("VirtualMachine/192.168.0.200:vm-126/name");
-    System.out.println("vm single prop: " + vmSingleProp);
+    Gson g = new Gson();
+    JsonObject jo = g.fromJson(res, JsonObject.class);
+    String id = jo.getAsJsonObject("returnval").get("val").getAsString();
+    System.out.println(id);
 
-    String vmMultiProps = client.get("VirtualMachine/192.168.0.200:vm-126/name,config.hardware.device");
-    System.out.println("vm multi props: " + vmMultiProps);
+    String relPath = "EventHistoryCollector/" + ip + ":" + URLEncoder.encode(id, "UTF-8");
+    System.out.println(relPath);
+    String collector = client.get(relPath);
+    System.out.println(collector);
+
+    String delPath = "EventHistoryCollector/" + ip + ":" + URLEncoder.encode(id, "UTF-8") + "/destroyCollector";
+    System.out.println(delPath);
+    String delRes = client.post(delPath, "");
+    System.out.println(delRes);
   }
 }

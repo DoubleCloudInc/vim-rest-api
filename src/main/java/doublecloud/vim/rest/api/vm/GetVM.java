@@ -1,6 +1,7 @@
 /** Copyright DoubleCloud Inc. */
-package doublecloud.vim.rest.api;
+package doublecloud.vim.rest.api.vm;
 
+import doublecloud.vim.rest.api.RestClient;
 import java.io.IOException;
 
 /**
@@ -12,18 +13,20 @@ public class GetVM
   public static void main(String[] args) throws IOException {
     RestClient client = new RestClient("http://localhost:8080/api", "admin", "doublecloud");
 
-    // only need to add a new vCenter once
-    String addVC = "{\"ip\": \"192.168.0.200\",\"username\": \"root\", \"password\": \"doublecloud\"}";
-    client.post("ServiceInstance", addVC);
+    String ip = "192.168.0.200";
+    String username = "root";
+    String password = "doublecloud";
+    client.addServer(ip, username, password);
 
     // the vm id which is part of URL can be retrieved using list operation
-    String vmAllProps = client.get("VirtualMachine/192.168.0.200:vm-126");
+    String moid = "vm-126";
+    String vmAllProps = client.get("VirtualMachine/192.168.0.200:" + moid);
     System.out.println("vm all props: " + vmAllProps);
 
-    String vmSingleProp = client.get("VirtualMachine/192.168.0.200:vm-126/name");
+    String vmSingleProp = client.get("VirtualMachine/192.168.0.200:" + moid + "/name");
     System.out.println("vm single prop: " + vmSingleProp);
 
-    String vmMultiProps = client.get("VirtualMachine/192.168.0.200:vm-126/name,config.hardware.device");
+    String vmMultiProps = client.get("VirtualMachine/192.168.0.200:" + moid + "/name,config.hardware.device");
     System.out.println("vm multi props: " + vmMultiProps);
   }
 }
