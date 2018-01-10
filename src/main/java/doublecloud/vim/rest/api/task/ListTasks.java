@@ -22,7 +22,7 @@ public class ListTasks
     client.addServer(ip, username, password);
 
     // for events per type, entity, time range - no need to have all but some
-    String filterSpec = "{'filter':{'state':['error']}}";
+    String filterSpec = "{'filter':{'state':['error'],'entity':{'entity':{'type':'VirtualMachine','val':'vm-3094'},'recursion':'self'}}}".replaceAll("'", "\"");
     String res = client.post("TaskManager/" + ip + "/createCollectorForTasks", filterSpec);
     System.out.println("res:" + res);
 

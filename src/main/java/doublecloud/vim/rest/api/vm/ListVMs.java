@@ -27,7 +27,7 @@ public class ListVMs
     System.out.println("vms: " + vms);
 
     // Get VMs under a particular entity like Folder in a single vCenter/ESXi server
-    String folderId = "group-v3189";
+    String folderId = "group-d1";
     vms = client.get("VirtualMachine?root=" + ip + ":" + folderId);
     System.out.println("vms: " + vms);
 

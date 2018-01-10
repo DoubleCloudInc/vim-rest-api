@@ -20,7 +20,7 @@ To run the server, you simply double click on the jar file. The Web GUI will be 
 To change the settings, you want to run it with the command line as follows. The detailed command arguments are very simple and decribed in the console output.
 
 ```
-java -jar vimrest-1.0.jar [port] [<access-key> <secret-key>]
+java -jar vimrest-2.0.jar [port] [<access-key> <secret-key>]
 ```
 
 ## Trying the Web GUI
@@ -35,6 +35,8 @@ Now you can try out the GET of VirtualMachine resource as well as other resource
 ### Power On VMs
 If you want to change something, you will use the POST method on related resources. For a quick example, you can power on a virtual machine from last step.
 
+## Live Samples (New in 2.0)
+The API server is also an application platform where you can create your own Web applications that leverage the VimREST APIs. To demonstrate how it works, we include a few live samples. You can get to it with the link included on the Web GUI.
 
 # API URL Patterns
 
@@ -48,7 +50,7 @@ vcenter01.example.com:host-321
 ```
 
 ## List Resources
-The following URL retrieves all the resources of certain types from all or certain optional roots. When root is not provided, it defaults to all. When the root query parameters are there, it will list all the resources under these root resources.
+The following URL retrieves all the resources of certain types from all or certain optional roots. When root is not provided, it defaults to all. When the *root* query parameters are there, it will list all the resources under these root resources.
 ```
 GET http://<api-server-ip-or-fqdn>:<port>/<resource-type-name>?root=<id>&root=<id>
 ```
@@ -63,7 +65,7 @@ Once you get the id of a resource (most likely from the above listing), you can 
 GET http://<api-server-ip-or-fqdn>:<port>/<resource-type-name>/<resource-id>/<optional-property-names>
 ```
 
-The property names are names of properties delimited with comma. They are optional. When not provided, it defaults to all properties.
+The property names are names of properties delimited with comma (no additional space). They are optional. When not provided, it defaults to all properties.
 
 ## Take Actions
 To manage the target vSphere, you can POST against certain resource, for example, power on a virtual machines, etc. The URL is like this:
@@ -77,9 +79,20 @@ or
 {"host":null}
 ```
 
-For singleton resources (only one instance within one vCenter or ESXi context), you can omit the manaaged object ID and use only vSphere IP or FQDN.
+For singleton resources (only one instance within one vCenter or ESXi context), you can omit the managed object ID and use only vSphere IP or FQDN.
 
+## Caching (New in 2.0)
+To use the cached properties of a managed object, you can use the *cache* URL parameter. Before using the cached value, you should have had a retrieval.
+```
+GET http://<api-server-ip-or-fqdn>:<port>/<resource-type-name>/<resource-id>/<optional-property-names>?cache=true
+```
 
+## Multi vCenter Users (New in 2.0)
+For one vCenter server, you can POST multiple ServiceInstance resource under different username and password. To act under a particular user so that you can leverage the security model of vCenter, you can pass in *user* URL parameter:
+```
+POST http://<api-server-ip-or-fqdn>:<port>/<resource-type-name>/<resource-id>/<action-name>?user=<username>
+```
+The user parameter is optional. When you have only one user, you can simply ignore the user parameter.
 
 # FAQ
 
@@ -87,7 +100,10 @@ For singleton resources (only one instance within one vCenter or ESXi context), 
 The REST APIs is very easy to get started with. We have included a Web GUI, with which you can easily try out the APIs. If you have used the vSphere APIs, the learning curves is zero. If you have never used vSphere APIs, the initial learning curve is also very low. When you need more advanced features like changing VM configuration, the learning curve becomes higher but definitely not to the level of the vSphere API itself.
 
 ## What can I do with the REST APIs?
-You can do almost everything as you can with the VMware vSphere Web Client.
+You can do almost everything as you can with the VMware vSphere Web Client. This REST APIs provides complete capabilities of vSphere APIs.
+
+## Where to start if I want to build a Web application using this REST APIs?
+There are many Web application frameworks like VueJS, Angular, React, etc. They can all use the REST APIs well. It's a matter of your own preference and company policy. We have a few simple yet live samples illustrating how to achieve it with Angular and VueJS.
 
 ## Can we use the API with existing installations?
 Yes. Whatever installation of vCenter or vSphere is fine.
@@ -99,13 +115,13 @@ No. The API server is written in Java thus can run everywhere including your des
 All the versions of vSphere VMware has shipped. The API supports mixed versions of vSphere as well, so you don't have to upgrade just because of the APIs.
 
 ## How many vCenter servers or ESxi server can it support?
-There is no limit on the number except the resouce required to run the API server. In reality, you won't hit the limit.
+There is no limit on the number except the resouce required to run the API server. In reality, you won't hit the limit. If you do, talk to us.
 
 ## What languages are supported?
 Any programming languages that support HTTP, which essentially means every modern programming and scripting languages. Included in this project as REST clients are Java, Shell scripts, Python, PowerShell. Contributions are very welcome.
 
 ## Is it related to VMware vSphere REST APIs?
-No, but it's related to the offical vSphere APIs which is defined as SOAP service - the DoubleCloud REST APIs shares the same object model of the vSphere APIs, and adds much more features on scalability and usability.
+No, but it's related to the offical vSphere APIs which is defined as SOAP service - the DoubleCloud REST APIs shares the same object model of the vSphere APIs, and adds much more features on scalability, caching, and usability.
 
-## Do I have to switch from vijava to this REST APIs?
+## Do I have to switch from vijava or vijavaNG to this REST APIs?
 You don't have to. Both SOAP and REST work well. If you have more than one vCenter or ESXi to manage, using this REST APIs will make life easier due to its built-in support.

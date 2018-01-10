@@ -28,5 +28,8 @@ public class GetVM
 
     String vmMultiProps = client.get("VirtualMachine/192.168.0.200:" + moid + "/name,config.hardware.device");
     System.out.println("vm multi props: " + vmMultiProps);
+
+    String vmAllPropsCached = client.get("VirtualMachine/192.168.0.200:" + moid + "?cache=false&user=" + username);
+    System.out.println("vm all props: " + vmAllPropsCached);
   }
 }
