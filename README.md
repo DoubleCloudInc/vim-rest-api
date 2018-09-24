@@ -125,4 +125,3 @@ No, but it's related to the offical vSphere APIs which is defined as SOAP servic
 
 ## Do I have to switch from vijava or vijavaNG to this REST APIs?
 You don't have to. Both SOAP and REST work well. If you have more than one vCenter or ESXi to manage, using this REST APIs will make life easier due to its built-in support.
-
